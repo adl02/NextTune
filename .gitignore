@@ -1,0 +1,40 @@
+# Gradle files
+.gradle/
+build/
+**/build/
+
+# Local configuration
+.idea/
+*.iml
+*.ipr
+*.iws
+local.properties
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Kotlin specific
+*.kotlin_module
+
+# Log files
+*.log
+
+# Android specific
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.ap_
+*.dex
+
+# Jetpack Compose
+compose-compiler.log
+
+# Others
+*.keystore
+*.jks
+!gradle-wrapper.jar
+
+# Cache
+.cache/
