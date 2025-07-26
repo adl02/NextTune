@@ -2,7 +2,6 @@
 
 **NextTune** is a collaborative YouTube streaming app where friends can create or join rooms to watch videos together and chat in real-time — just like you're in the same room, even when you're not.
 
-![Banner](https://your-banner-image-url.com) <!-- Optional: Replace with a real banner URL -->
 
 ## 🎯 Key Features
 
@@ -35,7 +34,7 @@ Coming soon...
 
 ## 📧 Contact
 
-For collaboration or suggestions: [your-email@example.com]
+For collaboration or suggestions: [mdadiljawed786@gmail.com]
 
 ---
 
