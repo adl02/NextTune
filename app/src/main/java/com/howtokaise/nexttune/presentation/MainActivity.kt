@@ -28,8 +28,9 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .navigationBarsPadding()
                 ) { innerPadding ->
-                  // NavGraph(NavHostController)
-                    Participants(NavHostController)
+                   NavGraph(NavHostController)
+                  //  Participants(NavHostController)
+                  //  HomeScreen(NavHostController)
                 }
             }
         }

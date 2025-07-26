@@ -147,8 +147,6 @@ fun LiveChat() {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    //.padding(bottom = 12.dp),
-                    //.background(Color(0xFF1B2735)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextField(
@@ -159,7 +157,6 @@ fun LiveChat() {
                         modifier = Modifier
                             .weight(1f)
                             .height(55.dp),
-                        // .background(Color(0xFF3E444B)),
                         colors = TextFieldDefaults.colors(
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
@@ -172,7 +169,7 @@ fun LiveChat() {
                             unfocusedTextColor = Color.White,
                         )
                     )
-                    // Spacer(modifier = Modifier.width(8.dp))
+                    
                     Box(
                         modifier = Modifier
                             .padding(end = 5.dp)
@@ -183,9 +180,7 @@ fun LiveChat() {
                                     colors = listOf(Color(0xFF00C6FF), Color(0xFF0072FF))
                                 )
                             )
-                            .clickable {
-                                // Handle send click
-                            },
+                            .clickable { },
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -204,7 +199,7 @@ fun LiveChat() {
 @Composable
 fun TypingDotsAnimation() {
     val dotCount = 3
-    val delays = listOf(0L, 250L, 500L) // Per dot delay
+    val delays = listOf(0L, 250L, 500L)
 
     Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
         repeat(dotCount) { index ->
@@ -212,7 +207,7 @@ fun TypingDotsAnimation() {
 
             LaunchedEffect(key1 = index) {
                 while (true) {
-                    delay(delays[index]) // Delay before starting animation for each dot
+                    delay(delays[index])
                     yOffset.animateTo(
                         targetValue = -6f,
                         animationSpec = tween(durationMillis = 300, easing = LinearEasing)
@@ -221,7 +216,7 @@ fun TypingDotsAnimation() {
                         targetValue = 0f,
                         animationSpec = tween(durationMillis = 300, easing = LinearEasing)
                     )
-                    delay(300) // Delay before next bounce cycle
+                    delay(300)
                 }
             }
 
