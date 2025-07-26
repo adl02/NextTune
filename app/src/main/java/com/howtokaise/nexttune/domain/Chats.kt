@@ -11,21 +11,21 @@ data class Chats(
 )
 val chat = listOf(
     Chats(
-        profile = R.drawable.lol,
+        profile = R.drawable.appicon,
         name = "NextTune",
         time = "16:00",
         message = "Welcome to the room, Invite and enjoy with your loved ones!"
     ),
     Chats(
-        profile = R.drawable.lol,
+        profile = R.drawable.appicon,
         name = "NextTune",
-        time = "16:00",
-        message = "Welcome to the room, Invite and enjoy with your loved ones!"
+        time = "1:00",
+        message = "he room, Invite and enjoy with your loved ones!"
     ),
     Chats(
-        profile = R.drawable.lol,
+        profile = R.drawable.appicon,
         name = "NextTune",
         time = "16:00",
-        message = "Welcome to the room, Invite and enjoy with your loved ones!"
+        message = ", Invite and enjoy with your loved ones!"
     )
 )

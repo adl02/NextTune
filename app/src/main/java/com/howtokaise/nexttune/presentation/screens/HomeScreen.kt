@@ -1,5 +1,6 @@
 package com.howtokaise.nexttune.presentation.screens
 
+import AnimatedGlowingBackground
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,23 +33,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.howtokaise.nexttune.domain.navigation.Route
 
-@Preview(showSystemUi = true, showBackground = true)
+
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navHostController: NavHostController) {
 
     var username by remember { mutableStateOf("") }
     var joinuser by remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        GradientBackground {}
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer { alpha = 0.6f }
-                .background(Color.Transparent)
-                .blur(40.dp)
-        )
+    AnimatedGlowingBackground {
+
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -62,7 +59,8 @@ fun HomeScreen() {
                     .background(Color(0xFF1F2836))
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp)
+                    modifier = Modifier
+                        .padding(20.dp)
                 ) {
                     Text(
                         text = "Create Room",
@@ -118,7 +116,8 @@ fun HomeScreen() {
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Button(
-                        onClick = { /* your action */ },
+                        onClick = {navHostController.navigate(Route.MainScreen.route)
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                         contentPadding = PaddingValues(),
                         modifier = Modifier

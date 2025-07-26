@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.howtokaise.nexttune.domain.navigation.NavGraph
 import com.howtokaise.nexttune.presentation.screens.HomeScreen
 import com.howtokaise.nexttune.presentation.screens.MainScreen
+import com.howtokaise.nexttune.presentation.screens.Participants
 import com.howtokaise.nexttune.presentation.ui.theme.NextTuneTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,13 +21,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val NavHostController = rememberNavController()
             NextTuneTheme {
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
                         .navigationBarsPadding()
                 ) { innerPadding ->
-                    MainScreen()
+                  // NavGraph(NavHostController)
+                    Participants(NavHostController)
                 }
             }
         }

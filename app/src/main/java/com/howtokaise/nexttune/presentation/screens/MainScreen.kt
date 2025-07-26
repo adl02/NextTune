@@ -1,5 +1,6 @@
 package com.howtokaise.nexttune.presentation.screens
 
+import AnimatedGlowingBackground
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,71 +33,84 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.howtokaise.nexttune.R
-import com.howtokaise.nexttune.domain.YouTubePlayerComposable
+import com.howtokaise.nexttune.domain.navigation.Route
+import com.howtokaise.nexttune.presentation.YouTubePlayerComposable
 
-@Preview(showBackground = true, showSystemUi = true)
+//@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MainScreen() {
-    //GradientBackground {  }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .background(Color(0XFF121926))
-                .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.lol),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RectangleShape),
-                contentScale = ContentScale.Crop
-            )
+fun MainScreen(navHostController: NavHostController) {
 
-            Spacer(modifier = Modifier.width(20.dp))
-
-            Text(
-                text = "NextTune",
-                style = TextStyle(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFF00C6FF),
-                            Color(0xFF0072FF)
-                        )
-                    )
-                ),
-                fontSize = 23.sp,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Image(
-                painter = painterResource(id = R.drawable.menu),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(CircleShape),
-                colorFilter = ColorFilter.tint(Color.White)
-            )
-        }
-
+    AnimatedGlowingBackground {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(5.dp)
         ) {
-            YouTubePlayerComposable(videoId ="C5AGwYeItU")//k
-            LiveChat()
-        }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .background(Color(0XFF121926))
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.appicon),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RectangleShape),
+                    contentScale = ContentScale.Crop
+                )
 
+                Spacer(modifier = Modifier.width(20.dp))
+
+                Text(
+                    text = "NextTune",
+                    style = TextStyle(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFF00C6FF),
+                                Color(0xFF0072FF)
+                            )
+                        )
+                    ),
+                    fontSize = 23.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                ParticipantCount(
+                    count = 3,
+                    onClick = {
+                        navHostController.navigate(Route.Participants.route)
+                    }
+                )
+
+                Spacer(modifier = Modifier.width(19.dp))
+
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(35.dp)
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(5.dp)
+            ) {
+                YouTubePlayerComposable(videoId = "C5AGwYeItU")//k
+                LiveChat()
+            }
+
+        }
     }
 }

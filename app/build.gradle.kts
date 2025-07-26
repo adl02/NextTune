@@ -59,4 +59,7 @@ dependencies {
 
     //youtube player
     implementation (libs.core)
+
+    // navigation
+    implementation(libs.androidx.navigation.compose)
 }
