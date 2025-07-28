@@ -30,7 +30,9 @@ fun YouTubePlayerComposable(videoId: String) {
 
                 addYouTubePlayerListener(object : AbstractYouTubePlayerListener(){
                     override fun onReady(youTubePlayer: YouTubePlayer) {
-                        youTubePlayer.loadVideo(videoId,0f)
+                        if (videoId.isNotBlank()) {
+                            youTubePlayer.loadVideo(videoId, 0f)
+                        }
                     }
                 })
             }

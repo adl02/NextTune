@@ -4,7 +4,6 @@ import AnimatedGlowingBackground
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,6 +32,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,21 +41,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.howtokaise.nexttune.domain.chat
+import androidx.navigation.NavHostController
+import com.howtokaise.nexttune.data.remote.api.SocketManager
+import com.howtokaise.nexttune.domain.ChatMessage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LiveChat() {
-
+    val chatMessages = remember { mutableStateListOf<ChatMessage>() }
     var message by remember { mutableStateOf("") }
+    val scrollState = rememberLazyListState()
+
     AnimatedGlowingBackground {
         Column(
             modifier = Modifier
@@ -69,7 +75,6 @@ fun LiveChat() {
                     )
                 )
         ) {
-
             Row(
                 modifier = Modifier
                     .height(50.dp)
@@ -84,7 +89,6 @@ fun LiveChat() {
                         )
                     ),
                 verticalAlignment = Alignment.CenterVertically
-
             ) {
                 Text(
                     text = "Live Chat",
@@ -96,45 +100,49 @@ fun LiveChat() {
                 Spacer(modifier = Modifier.width(15.dp))
                 TypingDotsAnimation()
             }
+
             LazyColumn(
+                state = scrollState,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
             ) {
-
-                items(chat) { chatItem ->
-                    Row(
+                items(chatMessages) { chatItem ->
+                    Column(
                         modifier = Modifier.padding(start = 15.dp, top = 8.dp, end = 22.dp)
                     ) {
-                        Image(
-                            painter = painterResource(id = chatItem.profile),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column {
-                            Row {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (chatItem.isAdmin) {
                                 Text(
-                                    text = chatItem.name,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
+                                    text = "Admin",
+                                    color = Color.Red,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(end = 4.dp)
                                 )
-
-                                Spacer(modifier = Modifier.width(4.dp))
-
+                            } else if (chatItem.isMod) {
                                 Text(
-                                    text = chatItem.time, fontSize = 11.sp, color = Color.LightGray
+                                    text = "Mod",
+                                    color = Color.Yellow,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(end = 4.dp)
                                 )
                             }
+
                             Text(
-                                text = chatItem.message,
-                                color = Color.LightGray
+                                text = "${chatItem.name} • ${chatItem.time}",
+                                color = Color.LightGray,
+                                fontSize = 12.sp
                             )
                         }
+                        Text(
+                            text = chatItem.message,
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
                     }
                 }
             }
@@ -145,8 +153,7 @@ fun LiveChat() {
                     .background(Color(0xFF00C6FF).copy(alpha = 0.2f)),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextField(
@@ -169,7 +176,7 @@ fun LiveChat() {
                             unfocusedTextColor = Color.White,
                         )
                     )
-                    
+
                     Box(
                         modifier = Modifier
                             .padding(end = 5.dp)

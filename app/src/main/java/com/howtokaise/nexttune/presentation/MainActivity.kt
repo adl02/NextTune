@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.howtokaise.nexttune.data.remote.api.SocketManager
 import com.howtokaise.nexttune.domain.navigation.NavGraph
 import com.howtokaise.nexttune.presentation.screens.HomeScreen
 import com.howtokaise.nexttune.presentation.screens.MainScreen
@@ -20,6 +21,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        SocketManager.initSocket()
+        SocketManager.connect()
         setContent {
             val NavHostController = rememberNavController()
             NextTuneTheme {
@@ -29,8 +32,6 @@ class MainActivity : ComponentActivity() {
                         .navigationBarsPadding()
                 ) { innerPadding ->
                    NavGraph(NavHostController)
-                  //  Participants(NavHostController)
-                  //  HomeScreen(NavHostController)
                 }
             }
         }

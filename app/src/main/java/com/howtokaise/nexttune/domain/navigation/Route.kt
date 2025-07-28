@@ -8,5 +8,4 @@ sealed class Route(
     object MainScreen : Route("MainScreen")
     object MusicList : Route("MusicList")
     object Participants : Route("Participants")
-
 }
