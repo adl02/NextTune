@@ -1,7 +1,6 @@
 package com.howtokaise.nexttune.presentation.screens
 
 import AnimatedGlowingBackground
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,13 +34,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.howtokaise.nexttune.data.remote.api.SocketManager
+import com.howtokaise.nexttune.domain.MainViewModel
 import com.howtokaise.nexttune.domain.navigation.Route
-import org.json.JSONObject
 
 
 @Composable
-fun HomeScreen(navHostController: NavHostController) {
+fun HomeScreen(
+    navHostController: NavHostController,
+    viewModel: MainViewModel
+) {
 
     var username by remember { mutableStateOf("") }
     var roomname by remember { mutableStateOf("") }
@@ -159,6 +160,7 @@ fun HomeScreen(navHostController: NavHostController) {
 
                     Button(
                         onClick = {
+                            viewModel.createRoom(username,roomname)
                             showUsernameError = !usernameValid
                             showRoomnameError = !roomnameValid
 
@@ -296,6 +298,8 @@ fun HomeScreen(navHostController: NavHostController) {
 
                     Button(
                         onClick = {
+
+                            viewModel.joinRoom(joinuser,roomCode.toInt())
                             JoinUsernameError = !JoinuserValid
                             JoinRoomCodeError = !roomCodeValid
 

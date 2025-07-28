@@ -1,6 +1,11 @@
 package com.howtokaise.nexttune.domain.navigation
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,8 +21,24 @@ import com.howtokaise.nexttune.presentation.screens.SplashScreen
 
 @Composable
 fun NavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    showError: Boolean = false,
+    errorMessage: String = "",
+    onDismissError: () -> Unit = {}
 ) {
+    if (showError) {
+        AlertDialog(
+            onDismissRequest = onDismissError,
+            title = { Text("Error") },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                Button(onClick = onDismissError) {
+                    Text("OK")
+                }
+            }
+        )
+    }
     NavHost(
         navController = navController,
         startDestination = Route.SplashScreen.route
@@ -26,10 +47,17 @@ fun NavGraph(
             SplashScreen(navController)
         }
         composable(Route.HomeScreen.route) {
-            HomeScreen(navController)
+            HomeScreen(
+                navController,
+                viewModel = viewModel()
+            )
         }
         composable(Route.MainScreen.route){
-            MainScreen(navController)
+            MainScreen(
+                navController,
+                roomCode = 802164,
+                viewModel = viewModel()
+            )
         }
         composable(Route.MusicList.route){
             MusicList()

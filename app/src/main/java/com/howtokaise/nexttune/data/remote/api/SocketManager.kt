@@ -1,56 +1,26 @@
 package com.howtokaise.nexttune.data.remote.api
 
+import android.util.Log
 import io.socket.client.IO
 import io.socket.client.Socket
-import org.json.JSONObject
 
+// SocketManager.kt
 object SocketManager {
     private lateinit var socket: Socket
 
     fun initSocket() {
         try {
             socket = IO.socket("https://nexttune.onrender.com")
-
-            socket.on(Socket.EVENT_CONNECT) {
-                println("✅ Socket connected!")
-            }
-            socket.on(Socket.EVENT_DISCONNECT) {
-                println("❌ Socket disconnected!")
-            }
-            socket.on(Socket.EVENT_CONNECT_ERROR) {
-                println("🚨 Connection error: ${it[0]}")
-            }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("SocketManager", "Socket initialization failed", e)
         }
     }
 
-    fun connect(){
-        socket.connect()
-    }
-
-    fun disconnect(){
-        socket.disconnect()
-    }
-
-    fun emit(event: String, data : JSONObject){
-        socket.emit(event, data)
-    }
-
-    fun on(event: String, callback: (JSONObject) -> Unit) {
-        socket.on(event) { args ->
-            if (args.isNotEmpty()) {
-                val rawData = args[0]
-                val data = when (rawData) {
-                    is JSONObject -> rawData
-                    is String -> JSONObject(rawData)
-                    else -> JSONObject(rawData.toString())
-                }
-                callback(data)
-            }
+    fun connect() {
+        if (!socket.connected()) {
+            socket.connect()
         }
     }
-
 
     fun getSocket(): Socket = socket
 }

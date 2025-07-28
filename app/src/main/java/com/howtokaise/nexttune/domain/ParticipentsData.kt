@@ -20,49 +20,5 @@ val peoples = listOf(
     People(
         name = "Adil",
         time = "20 m ago"
-    ),
-    People(
-        name = "Adil",
-        time = "20 m ago"
-    ),
-    People(
-        name = "Adil",
-        time = "20 m ago"
-    ),
-    People(
-        name = "Adil",
-        time = "20 m ago"
-    ),People(
-        name = "Adil",
-        time = "20 m ago"
     )
-    ,People(
-        name = "Adil",
-        time = "20 m ago"
-    ),
-    People(
-        name = "Adil",
-        time = "20 m ago"
-    ),
-    People(
-        name = "Adil",
-        time = "20 m ago"
-    ),
-    People(
-        name = "Adil",
-        time = "20 m ago"
-    ),
-    People(
-        name = "Adil",
-        time = "20 m ago"
-    ),People(
-        name = "Adil",
-        time = "20 m ago"
-    )
-    ,People(
-        name = "Adil",
-        time = "20 m ago"
-    )
-
-
 )

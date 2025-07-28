@@ -44,19 +44,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.howtokaise.nexttune.data.remote.api.SocketManager
-import com.howtokaise.nexttune.domain.ChatMessage
-import kotlinx.coroutines.Dispatchers
+import com.howtokaise.nexttune.domain.data.ChatMessage
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
-fun LiveChat() {
+fun LiveChat(
+    messages : List<ChatMessage>,
+    onSendMessage : (String) -> Unit
+) {
     val chatMessages = remember { mutableStateListOf<ChatMessage>() }
     var message by remember { mutableStateOf("") }
     val scrollState = rememberLazyListState()
