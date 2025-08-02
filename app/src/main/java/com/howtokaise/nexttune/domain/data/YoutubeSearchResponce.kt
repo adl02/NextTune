@@ -1,4 +1,4 @@
-package com.howtokaise.nexttune.data.remote.api
+package com.howtokaise.nexttune.domain.data
 
 data class YouTubeSearchResponse(
     val id: VideoId,

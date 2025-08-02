@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,27 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.R
-import com.howtokaise.nexttune.domain.MainViewModel
 import com.howtokaise.nexttune.domain.navigation.Route
 import com.howtokaise.nexttune.presentation.YouTubePlayerComposable
 
 @Composable
-fun MainScreen(
-    navHostController: NavHostController,
-    roomCode: Int,
-    viewModel: MainViewModel
-) {
-
-    // Observe ViewModel state
-    val users = viewModel.users
-    val chatMessages = viewModel.chatMessages
-    val currentVideoId = viewModel.currentVideoId.value
-    val isPlaying = viewModel.isPlaying.value
-
-    LaunchedEffect(currentVideoId) {
-        if (currentVideoId.isNotEmpty())
-        viewModel.syncPlayVideo(currentVideoId)
-    }
+fun MainScreen(navHostController: NavHostController) {
 
     AnimatedGlowingBackground {
         Column(
@@ -117,14 +100,10 @@ fun MainScreen(
                     .fillMaxSize()
                     .padding(5.dp)
             ) {
-                YouTubePlayerComposable(videoId = currentVideoId.ifEmpty { "C5AGwYeItU" },
-                    isPlaying = isPlaying
-                )//k
-                LiveChat(
-                    messages = chatMessages,
-                    onSendMessage = { message -> viewModel.sendMessage(message) }
-                )
+                YouTubePlayerComposable(videoId = "C5AGwYeItUk")//k
+                LiveChat()
             }
+
         }
     }
 }

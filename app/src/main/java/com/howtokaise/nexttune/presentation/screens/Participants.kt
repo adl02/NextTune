@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.R
-import com.howtokaise.nexttune.domain.peoples
+import com.howtokaise.nexttune.domain.data.people
 
 
 @Composable
@@ -91,7 +91,7 @@ fun Participants(navHostController: NavHostController) {
                     .fillMaxSize()
                     .clip(RoundedCornerShape(12.dp))
             ){
-                items(peoples){ chatItem ->
+                items(people){ chatItem ->
                     Row(
                         modifier = Modifier.padding(start = 15.dp, top = 8.dp, end = 22.dp, bottom = 8.dp)
                     ) {
@@ -127,7 +127,7 @@ fun Participants(navHostController: NavHostController) {
 
                             }
                             Text(
-                                text = chatItem.time,
+                                text = chatItem.status,
                                 color = Color.LightGray
                             )
                         }

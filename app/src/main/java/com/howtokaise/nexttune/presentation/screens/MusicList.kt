@@ -14,9 +14,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,11 +32,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.howtokaise.nexttune.presentation.YouTubeViewModel
 
 
-@Preview(showBackground = true, showSystemUi = true)
+@OptIn(ExperimentalMaterial3Api::class)
+// @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun MusicList() {
+fun MusicList(viewModel: YouTubeViewModel) {
+
+    var searchText by rememberSaveable { mutableStateOf("") }
+    var isSearching by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -46,54 +57,77 @@ fun MusicList() {
             )
     ) {
 
-        Row(
-            modifier = Modifier
-                .height(50.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(
-                            Color(0xFF0072FF).copy(alpha = 0.5f),
-                            Color(0xFF242C3B0).copy(alpha = 0.2f)
-                        )
-                    )
-                ),
-            verticalAlignment = Alignment.CenterVertically
-
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                tint = Color(0xFF00C6FF)
-            )
-            Text(
-                text = "Up Next",
-                fontSize = 20.sp,
-                color = Color.White,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(start = 12.dp)
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-            Box(
+        if (isSearching){
+            SearchBar(
+                query = searchText,
+                onQueryChange = {searchText = it},
+                onSearch = {
+                    viewModel.search(searchText)
+                    isSearching = false
+                },
+                active = isSearching,
+                onActiveChange = { isSearching = it},
+                placeholder = { Text("Search your music here") },
                 modifier = Modifier
-                    .padding(16.dp)
-                    .clickable { }
-            ) {
-                Row(
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .background(Color.Transparent)
+            ) { }
+        } else {
 
-                ){
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = Color(0xFF00C6FF)
-                    )
-                    Text(
-                        text = "Search",
-                        color = Color(0xFF00C6FF)
-                    )
+
+            Row(
+                modifier = Modifier
+                    .height(50.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(0xFF0072FF).copy(alpha = 0.5f),
+                                Color(0xFF242C3B0).copy(alpha = 0.2f)
+                            )
+                        )
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = Color(0xFF00C6FF)
+                )
+                Text(
+                    text = "Up Next",
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(start = 12.dp)
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .clickable { isSearching = true }
+                    ) {
+                        Row(
+
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
+                                tint = Color(0xFF00C6FF)
+                            )
+                            Text(
+                                text = "Search",
+                                color = Color(0xFF00C6FF),
+                            )
+                        }
+                    }
                 }
+
             }
         }
     }

@@ -16,8 +16,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 
 @Composable
 fun YouTubePlayerComposable(
-    videoId: String,
-    isPlaying: Boolean
+    videoId: String
 ) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle

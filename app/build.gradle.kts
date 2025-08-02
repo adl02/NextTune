@@ -76,9 +76,15 @@ dependencies {
     // For JSON
     implementation(libs.gson)
 
-    //deepseek
-    implementation("io.socket:socket.io-client:2.1.0")
+    // viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+
     implementation("com.google.code.gson:gson:2.10.1")
+
+
+
+// ViewModel & LiveData
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 }

@@ -5,6 +5,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,10 +21,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -32,7 +33,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,20 +42,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.howtokaise.nexttune.domain.data.ChatMessage
+import com.howtokaise.nexttune.domain.data.chat
 import kotlinx.coroutines.delay
 
-@Composable
-fun LiveChat(
-    messages : List<ChatMessage>,
-    onSendMessage : (String) -> Unit
-) {
-    val chatMessages = remember { mutableStateListOf<ChatMessage>() }
-    var message by remember { mutableStateOf("") }
-    val scrollState = rememberLazyListState()
 
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LiveChat() {
+
+    var message by remember { mutableStateOf("") }
     AnimatedGlowingBackground {
         Column(
             modifier = Modifier
@@ -70,6 +68,7 @@ fun LiveChat(
                     )
                 )
         ) {
+
             Row(
                 modifier = Modifier
                     .height(50.dp)
@@ -84,6 +83,7 @@ fun LiveChat(
                         )
                     ),
                 verticalAlignment = Alignment.CenterVertically
+
             ) {
                 Text(
                     text = "Live Chat",
@@ -95,49 +95,56 @@ fun LiveChat(
                 Spacer(modifier = Modifier.width(15.dp))
                 TypingDotsAnimation()
             }
-
             LazyColumn(
-                state = scrollState,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .padding(bottom = 8.dp)
             ) {
-                items(chatMessages) { chatItem ->
-                    Column(
+
+                items(chat) { chatItem ->
+                    Row(
                         modifier = Modifier.padding(start = 15.dp, top = 8.dp, end = 22.dp)
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            if (chatItem.isAdmin) {
-                                Text(
-                                    text = "Admin",
-                                    color = Color.Red,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(end = 4.dp)
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .border(
+                                    width = 0.4.dp,
+                                    Color.Cyan,
+                                    shape = CircleShape
                                 )
-                            } else if (chatItem.isMod) {
-                                Text(
-                                    text = "Mod",
-                                    color = Color.Yellow,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(end = 4.dp)
-                                )
-                            }
-
-                            Text(
-                                text = "${chatItem.name} • ${chatItem.time}",
-                                color = Color.LightGray,
-                                fontSize = 12.sp
+                                .background(Color.Transparent, shape = CircleShape),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = null,
+                                modifier = Modifier.size(30.dp)
                             )
                         }
-                        Text(
-                            text = chatItem.message,
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
+
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Column {
+                            Row {
+                                Text(
+                                    text = chatItem.name,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+
+                                Spacer(modifier = Modifier.width(4.dp))
+
+                                Text(
+                                    text = chatItem.time, fontSize = 11.sp, color = Color.LightGray
+                                )
+                            }
+                            Text(
+                                text = chatItem.message,
+                                color = Color.LightGray
+                            )
+                        }
                     }
                 }
             }
@@ -148,7 +155,8 @@ fun LiveChat(
                     .background(Color(0xFF00C6FF).copy(alpha = 0.2f)),
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextField(

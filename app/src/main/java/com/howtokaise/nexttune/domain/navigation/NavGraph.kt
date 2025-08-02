@@ -1,5 +1,6 @@
 package com.howtokaise.nexttune.domain.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -12,6 +13,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.howtokaise.nexttune.presentation.YouTubeViewModel
 import com.howtokaise.nexttune.presentation.screens.HomeScreen
 import com.howtokaise.nexttune.presentation.screens.LiveChat
 import com.howtokaise.nexttune.presentation.screens.MainScreen
@@ -19,26 +21,11 @@ import com.howtokaise.nexttune.presentation.screens.MusicList
 import com.howtokaise.nexttune.presentation.screens.Participants
 import com.howtokaise.nexttune.presentation.screens.SplashScreen
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun NavGraph(
-    navController: NavHostController,
-    modifier: Modifier = Modifier,
-    showError: Boolean = false,
-    errorMessage: String = "",
-    onDismissError: () -> Unit = {}
+    navController: NavHostController
 ) {
-    if (showError) {
-        AlertDialog(
-            onDismissRequest = onDismissError,
-            title = { Text("Error") },
-            text = { Text(errorMessage) },
-            confirmButton = {
-                Button(onClick = onDismissError) {
-                    Text("OK")
-                }
-            }
-        )
-    }
     NavHost(
         navController = navController,
         startDestination = Route.SplashScreen.route
@@ -47,20 +34,13 @@ fun NavGraph(
             SplashScreen(navController)
         }
         composable(Route.HomeScreen.route) {
-            HomeScreen(
-                navController,
-                viewModel = viewModel()
-            )
+            HomeScreen(navController)
         }
         composable(Route.MainScreen.route){
-            MainScreen(
-                navController,
-                roomCode = 802164,
-                viewModel = viewModel()
-            )
+            MainScreen(navController)
         }
         composable(Route.MusicList.route){
-            MusicList()
+            MusicList(YouTubeViewModel())
         }
         composable(Route.Participants.route){
            Participants(navController)
