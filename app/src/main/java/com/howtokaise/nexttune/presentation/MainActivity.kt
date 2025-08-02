@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.howtokaise.nexttune.domain.data.AppState
 import com.howtokaise.nexttune.domain.navigation.NavGraph
+import com.howtokaise.nexttune.domain.socket.SocketHandler
 import com.howtokaise.nexttune.presentation.screens.MusicList
 import com.howtokaise.nexttune.presentation.ui.theme.NextTuneTheme
 
@@ -26,6 +27,8 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SocketHandler.initSocket()
+        SocketHandler.connect()
         enableEdgeToEdge()
         setContent {
             val NavHostController = rememberNavController()
