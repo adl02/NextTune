@@ -6,6 +6,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -21,7 +22,6 @@ import com.howtokaise.nexttune.presentation.screens.MusicList
 import com.howtokaise.nexttune.presentation.screens.Participants
 import com.howtokaise.nexttune.presentation.screens.SplashScreen
 
-@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun NavGraph(
     navController: NavHostController
@@ -40,7 +40,8 @@ fun NavGraph(
             MainScreen(navController)
         }
         composable(Route.MusicList.route){
-            MusicList(YouTubeViewModel())
+            val youTubeVm: YouTubeViewModel = viewModel()
+            MusicList(youTubeVm)
         }
         composable(Route.Participants.route){
            Participants(navController)

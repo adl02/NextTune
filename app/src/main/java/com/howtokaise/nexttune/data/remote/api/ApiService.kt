@@ -5,8 +5,8 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface ApiService {
-    @GET("/search{query}")
+    @GET("search/{query}")
     suspend fun searchVideos(
-        @Path("query") query: String
+        @Path("query", encoded = true) query: String
     ): List<YouTubeSearchResponse>
 }

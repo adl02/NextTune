@@ -11,7 +11,7 @@ import com.howtokaise.nexttune.domain.data.YouTubeSearchResponse
 import kotlinx.coroutines.launch
 
 class YouTubeViewModel : ViewModel() {
-    private var results by mutableStateOf<List<YouTubeSearchResponse>>(emptyList())
+    var results by mutableStateOf<List<YouTubeSearchResponse>>(emptyList())
         private set
 
     var  isLoading by mutableStateOf(false)

@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
                         .navigationBarsPadding()
                 ) { innerPadding ->
                    // NavGraph(NavHostController)
-                    MusicList(YouTubeViewModel())
+                    MusicList(viewModel = YouTubeViewModel())
                 }
             }
         }

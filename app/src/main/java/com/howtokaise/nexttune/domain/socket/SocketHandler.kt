@@ -11,7 +11,7 @@ object SocketHandler {
     fun initSocket(){
         try {
             val opts = IO.Options()
-            socket = IO.socket("http://192.168.1.5:3000",opts)
+            socket = IO.socket("http://192.168.1.4:3000",opts)
 
             // Listen for connection success
             socket.on(Socket.EVENT_CONNECT) {
