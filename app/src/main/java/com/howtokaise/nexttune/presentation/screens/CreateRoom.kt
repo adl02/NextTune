@@ -15,6 +15,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,9 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.domain.navigation.Route
+import com.howtokaise.nexttune.presentation.RoomViewmodel
 
 @Composable
-fun CreateRoom(navHostController: NavHostController) {
+fun CreateRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
+
+    val status by viewmodel.status.collectAsState()
+    val roomData by viewmodel.roomData.collectAsState()
 
     var username by remember { mutableStateOf("") }
     var roomname by remember { mutableStateOf("") }
@@ -40,6 +46,14 @@ fun CreateRoom(navHostController: NavHostController) {
 
     val usernameValid = username.isNotBlank()
     val roomnameValid = roomname.isNotBlank()
+
+    LaunchedEffect(status) {
+        if (status == "room_created" || status == "joined") {
+            navHostController.navigate(Route.MainScreen.route) {
+                popUpTo(Route.HomeScreen.route) { inclusive = true }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -67,7 +81,13 @@ fun CreateRoom(navHostController: NavHostController) {
                     username = it
                     if (it.isNotBlank()) showUsernameError = false
                 },
-                placeholder = { Text("Enter your name", color = Color.Gray) },
+                placeholder = {
+                    if (showUsernameError) {
+                        Text("Please enter your name", color = Color.Red)
+                    } else {
+                        Text("Enter your name", color = Color.Gray)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -85,9 +105,6 @@ fun CreateRoom(navHostController: NavHostController) {
                     unfocusedTextColor = Color.White
                 )
             )
-            if (showUsernameError) {
-                Text("Please enter your name", color = Color.Red, fontSize = 13.sp)
-            }
 
             Spacer(modifier = Modifier.height(15.dp))
 
@@ -97,7 +114,13 @@ fun CreateRoom(navHostController: NavHostController) {
                     roomname = it
                     if (roomname.isNotBlank()) showRoomnameError = false
                 },
-                placeholder = { Text("Choose a room name", color = Color.Gray) },
+                placeholder = {
+                    if (showRoomnameError) {
+                        Text("Please choose a room name", color = Color.Red)
+                    } else {
+                        Text("Choose a room name", color = Color.Gray)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -115,22 +138,16 @@ fun CreateRoom(navHostController: NavHostController) {
                     unfocusedTextColor = Color.White
                 )
             )
-            if (showRoomnameError) {
-                Text("Please choose a room name", color = Color.Red, fontSize = 13.sp)
-            }
 
             Spacer(modifier = Modifier.height(15.dp))
 
             Button(
                 onClick = {
-
                     showUsernameError = !usernameValid
                     showRoomnameError = !roomnameValid
 
                     if (usernameValid && roomnameValid) {
-                        navHostController.navigate(Route.MainScreen.route) {
-                            popUpTo(Route.HomeScreen.route) { inclusive = true }
-                        }
+                        viewmodel.createRoom(username,roomname)
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),

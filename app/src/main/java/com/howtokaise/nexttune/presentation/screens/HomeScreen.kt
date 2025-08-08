@@ -1,6 +1,7 @@
 package com.howtokaise.nexttune.presentation.screens
 
 import AnimatedGlowingBackground
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,9 +42,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.domain.navigation.Route
+import com.howtokaise.nexttune.presentation.RoomViewmodel
 import kotlinx.coroutines.delay
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun HomeScreen(navHostController: NavHostController) {
 
@@ -54,7 +57,7 @@ fun HomeScreen(navHostController: NavHostController) {
             .fillMaxSize(),
         verticalArrangement = Arrangement.Center
     ) {
-        CreateRoom(navHostController)
+        CreateRoom(navHostController, viewmodel = RoomViewmodel())
 
         Text(
             text = "OR",
@@ -65,6 +68,6 @@ fun HomeScreen(navHostController: NavHostController) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        JoinRoom(navHostController)
+        JoinRoom(navHostController, viewmodel =  RoomViewmodel())
     }
 }

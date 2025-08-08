@@ -16,6 +16,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,9 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.domain.navigation.Route
+import com.howtokaise.nexttune.presentation.RoomViewmodel
 
 @Composable
-fun JoinRoom(navHostController: NavHostController) {
+fun JoinRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
+
+    val roomData by viewmodel.roomData.collectAsState()
 
     var joinuser by remember { mutableStateOf("") }
     var roomCode by remember { mutableStateOf("") }
@@ -70,7 +74,13 @@ fun JoinRoom(navHostController: NavHostController) {
                     joinuser = it
                     if (joinuser.isNotBlank()) JoinUsernameError = false
                 },
-                placeholder = { Text("Enter your name", color = Color.Gray) },
+                placeholder = {
+                    if (JoinUsernameError) {
+                        Text("Please enter your name", color = Color.Red)
+                    } else {
+                        Text("Enter your name", color = Color.Gray)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -88,9 +98,6 @@ fun JoinRoom(navHostController: NavHostController) {
                     unfocusedTextColor = Color.White
                 )
             )
-            if (JoinUsernameError) {
-                Text("Please enter your name", color = Color.Red, fontSize = 13.sp)
-            }
 
             Spacer(modifier = Modifier.height(15.dp))
 
@@ -101,13 +108,17 @@ fun JoinRoom(navHostController: NavHostController) {
                     if (roomCode.isNotBlank()) JoinRoomCodeError = false
                 },
                 placeholder = {
-                    Text(
-                        "Enter 6-digit code",
-                        fontSize = 18.sp,
-                        color = Color.Gray,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    if (JoinRoomCodeError) {
+                        Text("Please enter your 6-digit code", color = Color.Red)
+                    } else {
+                        Text(
+                            "Enter 6-digit code",
+                            fontSize = 18.sp,
+                            color = Color.Gray,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -127,15 +138,13 @@ fun JoinRoom(navHostController: NavHostController) {
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
-            if (JoinRoomCodeError) {
-                Text("Please enter your 6-digit code", color = Color.Red, fontSize = 13.sp)
-            }
 
             Spacer(modifier = Modifier.height(15.dp))
 
             Button(
                 onClick = {
 
+                    viewmodel.joinRoom(joinuser, roomCode.toInt())
                     JoinUsernameError = !JoinuserValid
                     JoinRoomCodeError = !roomCodeValid
 
