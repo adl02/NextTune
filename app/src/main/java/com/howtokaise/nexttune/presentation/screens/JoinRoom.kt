@@ -16,6 +16,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,8 @@ import com.howtokaise.nexttune.presentation.RoomViewmodel
 fun JoinRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
 
     val roomData by viewmodel.roomData.collectAsState()
+    val status by viewmodel.status.collectAsState()
+    val navigationToMain by viewmodel.navigateToMain.collectAsState()
 
     var joinuser by remember { mutableStateOf("") }
     var roomCode by remember { mutableStateOf("") }
@@ -47,6 +50,14 @@ fun JoinRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
 
     val JoinuserValid = joinuser.isNotBlank()
     val roomCodeValid = roomCode.isNotBlank()
+
+    LaunchedEffect(status) {
+        if (status == "room-created" || status == "user-joined") {
+            navHostController.navigate(Route.MainScreen.route) {
+                popUpTo(Route.HomeScreen.route) { inclusive = true }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -143,17 +154,14 @@ fun JoinRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
 
             Button(
                 onClick = {
-
-                    viewmodel.joinRoom(joinuser, roomCode.toInt())
                     JoinUsernameError = !JoinuserValid
                     JoinRoomCodeError = !roomCodeValid
 
-                    if (JoinuserValid && roomCodeValid) {
-                        navHostController.navigate(Route.MainScreen.route) {
-                            popUpTo(Route.HomeScreen.route) {
-                                inclusive = true
-                            }
-                        }
+                    if (JoinuserValid && roomCodeValid){
+                        viewmodel.joinRoom(
+                            name = joinuser,
+                            roomCode = roomCode
+                        )
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),

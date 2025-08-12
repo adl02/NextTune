@@ -17,8 +17,15 @@ class RoomViewmodel : ViewModel() {
     private val _roomData = MutableStateFlow<JSONObject?>(null)
     val roomData = _roomData.asStateFlow()
 
+    private val _navigateToMain = MutableStateFlow(false)
+    val navigateToMain = _navigateToMain.asStateFlow()
+
+    init {
+        connectToServer()
+    }
+
     fun connectToServer(){
-        SocketHandler.initSocket("http://192.168.1.12:3000")
+        SocketHandler.initSocket("http://192.168.1.7:3000")
         socket = SocketHandler.getSocket()
 
         socket.on(Socket.EVENT_CONNECT){
@@ -27,7 +34,20 @@ class RoomViewmodel : ViewModel() {
 
         socket.on("room-created"){ args ->
             val data = args[0] as JSONObject
-            viewModelScope.launch { _roomData.value = data }
+            viewModelScope.launch {
+                _roomData.value = data
+                _navigateToMain.value = true
+                _status.value = "room-created"
+            }
+        }
+
+        socket.on("room-joined"){ args ->
+            val data = args[0] as JSONObject
+            viewModelScope.launch {
+                _roomData.value = data
+                _navigateToMain.value = true
+                _status.value = "user-joined"
+            }
         }
 
         socket.on("room-not-found"){
@@ -44,10 +64,14 @@ class RoomViewmodel : ViewModel() {
         socket.emit("create-room",data)
     }
 
-    fun joinRoom(name: String, roomCode : Int){
+    fun joinRoom(name: String, roomCode : String){
         val data = JSONObject()
         data.put("joinRoom",name)
         data.put("joinRoomCode", roomCode)
         socket.emit("join-room", data)
+    }
+
+    fun resetNavigationFlag(){
+        _status.value = null.toString()
     }
 }

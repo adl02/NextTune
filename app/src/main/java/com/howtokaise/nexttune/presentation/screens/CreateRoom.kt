@@ -37,6 +37,7 @@ fun CreateRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
 
     val status by viewmodel.status.collectAsState()
     val roomData by viewmodel.roomData.collectAsState()
+    val navigationToMain by viewmodel.navigateToMain.collectAsState()
 
     var username by remember { mutableStateOf("") }
     var roomname by remember { mutableStateOf("") }
@@ -48,7 +49,7 @@ fun CreateRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
     val roomnameValid = roomname.isNotBlank()
 
     LaunchedEffect(status) {
-        if (status == "room_created" || status == "joined") {
+        if (status == "room-created" || status == "joined") {
             navHostController.navigate(Route.MainScreen.route) {
                 popUpTo(Route.HomeScreen.route) { inclusive = true }
             }
