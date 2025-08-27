@@ -14,14 +14,18 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.howtokaise.nexttune.domain.data.ChatMessage
+import com.howtokaise.nexttune.presentation.RoomViewmodel
 import com.howtokaise.nexttune.presentation.YouTubeViewModel
 import com.howtokaise.nexttune.presentation.screens.HomeScreen
 import com.howtokaise.nexttune.presentation.screens.LiveChat
 import com.howtokaise.nexttune.presentation.screens.MainScreen
 import com.howtokaise.nexttune.presentation.screens.MusicList
 import com.howtokaise.nexttune.presentation.screens.Participants
+import com.howtokaise.nexttune.presentation.screens.SideDrawer
 import com.howtokaise.nexttune.presentation.screens.SplashScreen
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun NavGraph(
     navController: NavHostController
@@ -37,7 +41,7 @@ fun NavGraph(
             HomeScreen(navController)
         }
         composable(Route.MainScreen.route){
-            MainScreen(navController)
+            MainScreen(navController, viewmodel = RoomViewmodel())
         }
         composable(Route.MusicList.route){
             val youTubeVm: YouTubeViewModel = viewModel()
@@ -45,6 +49,9 @@ fun NavGraph(
         }
         composable(Route.Participants.route){
            Participants(navController)
+        }
+        composable(Route.SideDrawer.route){
+            SideDrawer()
         }
     }
 }

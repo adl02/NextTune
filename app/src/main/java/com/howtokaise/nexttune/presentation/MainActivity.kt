@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.howtokaise.nexttune.domain.data.AppState
 import com.howtokaise.nexttune.domain.navigation.NavGraph
 import com.howtokaise.nexttune.domain.socket.SocketHandler
+import com.howtokaise.nexttune.presentation.screens.LiveChat
 import com.howtokaise.nexttune.presentation.screens.MusicList
 import com.howtokaise.nexttune.presentation.ui.theme.NextTuneTheme
 
@@ -42,8 +43,9 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                         .navigationBarsPadding()
                 ) { innerPadding ->
-                    NavGraph(NavHostController)
+                   // NavGraph(NavHostController)
                    // MusicList(viewModel = YouTubeViewModel())
+                    LiveChat(roomViewmodel)
                 }
             }
         }

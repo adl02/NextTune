@@ -1,10 +1,14 @@
 package com.howtokaise.nexttune.presentation
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.howtokaise.nexttune.domain.data.ChatMessage
 import com.howtokaise.nexttune.domain.socket.SocketHandler
 import io.socket.client.Socket
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -20,12 +24,15 @@ class RoomViewmodel : ViewModel() {
     private val _navigateToMain = MutableStateFlow(false)
     val navigateToMain = _navigateToMain.asStateFlow()
 
+    private val _messages = mutableStateListOf<ChatMessage>()
+    val messages : SnapshotStateList<ChatMessage> = _messages
+
     init {
         connectToServer()
     }
 
     fun connectToServer(){
-        SocketHandler.initSocket("http://192.168.1.7:3000")
+        SocketHandler.initSocket("http://192.168.1.5:3000")
         socket = SocketHandler.getSocket()
 
         socket.on(Socket.EVENT_CONNECT){
@@ -69,9 +76,5 @@ class RoomViewmodel : ViewModel() {
         data.put("joinRoom",name)
         data.put("joinRoomCode", roomCode)
         socket.emit("join-room", data)
-    }
-
-    fun resetNavigationFlag(){
-        _status.value = null.toString()
     }
 }

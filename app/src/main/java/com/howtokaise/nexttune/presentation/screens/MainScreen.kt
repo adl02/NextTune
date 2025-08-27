@@ -31,11 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.R
+import com.howtokaise.nexttune.domain.data.ChatMessage
 import com.howtokaise.nexttune.domain.navigation.Route
+import com.howtokaise.nexttune.presentation.RoomViewmodel
 import com.howtokaise.nexttune.presentation.YouTubePlayerComposable
 
 @Composable
-fun MainScreen(navHostController: NavHostController) {
+fun MainScreen(navHostController: NavHostController,viewmodel: RoomViewmodel) {
 
     AnimatedGlowingBackground {
         Column(
@@ -101,7 +103,7 @@ fun MainScreen(navHostController: NavHostController) {
                     .padding(5.dp)
             ) {
                 YouTubePlayerComposable(videoId = "C5AGwYeItUk")//k
-                LiveChat()
+                LiveChat(viewmodel)
             }
 
         }

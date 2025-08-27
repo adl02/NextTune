@@ -46,14 +46,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.howtokaise.nexttune.domain.data.chat
+import com.howtokaise.nexttune.presentation.RoomViewmodel
 import kotlinx.coroutines.delay
 
 
-@Preview(showBackground = true, showSystemUi = true)
+
 @Composable
-fun LiveChat() {
+fun LiveChat(viewmodel: RoomViewmodel) {
 
     var message by remember { mutableStateOf("") }
+    val messages = viewmodel.messages
     AnimatedGlowingBackground {
         Column(
             modifier = Modifier
@@ -102,7 +104,7 @@ fun LiveChat() {
                     .padding(bottom = 8.dp)
             ) {
 
-                items(chat) { chatItem ->
+                items(messages) { chatItem ->
                     Row(
                         modifier = Modifier.padding(start = 15.dp, top = 8.dp, end = 22.dp)
                     ) {
