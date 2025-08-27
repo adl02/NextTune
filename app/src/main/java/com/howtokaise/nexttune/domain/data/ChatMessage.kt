@@ -13,7 +13,7 @@ data class ChatMessage(
 
 val chat = listOf(
     ChatMessage(
-        name = "Adil",
+        name = "Adil   ",
         message = "hello",
         time = "00:00",
         isAdmin = true,
