@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.howtokaise.nexttune"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.howtokaise.nexttune"
@@ -58,35 +58,28 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //youtube player
-    implementation (libs.core)
-
+    implementation ("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
     // navigation
     implementation(libs.androidx.navigation.compose)
-
     // retrofit
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
-
     // For WebSocket
-    implementation("io.socket:socket.io-client:2.0.1")
-    {
-        exclude (group = "org.json", module = "json")
-    }
-
+    implementation("io.socket:socket.io-client:2.0.1") { exclude (group = "org.json", module = "json") }
     // For JSON
     implementation(libs.gson)
-
     // viewmodel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
-
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
+    // gson
     implementation("com.google.code.gson:gson:2.10.1")
-
-
-
 // ViewModel & LiveData
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
-
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")
+    // coil
     implementation ("io.coil-kt:coil-compose:2.7.0")
+    //icon
+    implementation("androidx.compose.material:material-icons-extended")
+    // pager
+    implementation("androidx.compose.foundation:foundation:1.9.4")
 }
