@@ -1,4 +1,4 @@
-package com.howtokaise.nexttune.presentation
+package com.howtokaise.nexttune.presentation.youtube
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
