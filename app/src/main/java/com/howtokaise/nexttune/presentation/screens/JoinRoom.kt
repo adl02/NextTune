@@ -1,5 +1,6 @@
 package com.howtokaise.nexttune.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,14 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.domain.navigation.Route
-import com.howtokaise.nexttune.presentation.RoomViewmodel
+import com.howtokaise.nexttune.presentation.viewmodel.RoomViewmodel
 
 @Composable
 fun JoinRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
 
     val roomData by viewmodel.roomData.collectAsState()
-    val status by viewmodel.status.collectAsState()
-    val navigationToMain by viewmodel.navigateToMain.collectAsState()
 
     var joinuser by remember { mutableStateOf("") }
     var roomCode by remember { mutableStateOf("") }
@@ -51,11 +50,13 @@ fun JoinRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
     val JoinuserValid = joinuser.isNotBlank()
     val roomCodeValid = roomCode.isNotBlank()
 
-    LaunchedEffect(status) {
-        if (status == "room-created" || status == "user-joined") {
+    LaunchedEffect(roomData) {
+        if (roomData != null) {
+            Log.d("Navigation", "JoinRoom -> roomData received, navigating to MainScreen")
             navHostController.navigate(Route.MainScreen.route) {
                 popUpTo(Route.HomeScreen.route) { inclusive = true }
             }
+            viewmodel.clearRoomData()
         }
     }
 

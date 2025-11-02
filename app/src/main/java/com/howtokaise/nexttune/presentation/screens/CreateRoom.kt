@@ -36,9 +36,7 @@ import com.howtokaise.nexttune.presentation.viewmodel.RoomViewmodel
 @Composable
 fun CreateRoom(navHostController: NavHostController,viewmodel: RoomViewmodel) {
 
-    val status by viewmodel.status.collectAsState()
     val roomData by viewmodel.roomData.collectAsState()
- //   val navigationToMain by viewmodel.navigateToMain.collectAsState()
 
     var username by remember { mutableStateOf("") }
     var roomname by remember { mutableStateOf("") }

@@ -25,7 +25,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,9 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.howtokaise.nexttune.presentation.YouTubeViewModel
+import com.howtokaise.nexttune.presentation.viewmodel.YouTubeViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,8 +84,6 @@ fun MusicList(viewModel: YouTubeViewModel) {
                     .background(Color.Transparent)
             ) { }
         } else {
-
-
             Row(
                 modifier = Modifier
                     .height(50.dp)

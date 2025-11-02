@@ -1,8 +1,12 @@
 package com.howtokaise.nexttune.presentation.screens
 
 import AnimatedGlowingBackground
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +16,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
@@ -31,13 +40,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.R
-import com.howtokaise.nexttune.domain.data.ChatMessage
 import com.howtokaise.nexttune.domain.navigation.Route
-import com.howtokaise.nexttune.presentation.RoomViewmodel
-import com.howtokaise.nexttune.presentation.YouTubePlayerComposable
+import com.howtokaise.nexttune.presentation.viewmodel.RoomViewmodel
+import com.howtokaise.nexttune.presentation.viewmodel.YouTubeViewModel
+import com.howtokaise.nexttune.presentation.youtube.YouTubeThumbnail
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
-fun MainScreen(navHostController: NavHostController,viewmodel: RoomViewmodel) {
+fun MainScreen(navHostController: NavHostController, viewmodel: RoomViewmodel) {
+
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = {2})
 
     AnimatedGlowingBackground {
         Column(
@@ -102,10 +114,16 @@ fun MainScreen(navHostController: NavHostController,viewmodel: RoomViewmodel) {
                     .fillMaxSize()
                     .padding(5.dp)
             ) {
-                YouTubePlayerComposable(videoId = "C5AGwYeItUk")//k
-                LiveChat(viewmodel)
-            }
+                // YouTubePlayerComposable(videoId = "C5AGwYeItUk") // youtube new policy
+                YouTubeThumbnail(imageId = "TBxS0XhdfmU")
 
+                HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) {page->
+                    when(page){
+                        0 -> LiveChat(viewmodel)
+                        1 -> MusicList(YouTubeViewModel())
+                    }
+                }
+            }
         }
     }
 }
