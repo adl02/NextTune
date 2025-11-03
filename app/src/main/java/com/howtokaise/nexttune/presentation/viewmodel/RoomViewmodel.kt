@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import org.json.JSONObject
 
 class RoomViewmodel : ViewModel() {
@@ -25,6 +26,9 @@ class RoomViewmodel : ViewModel() {
     val messages: SnapshotStateList<ChatMessage> = _messages
 
     private var listenersAttached = false
+
+    private var _myName: String? = null
+    val myName: String? get() = _myName
 
     init {
         connectToServer()
@@ -54,6 +58,7 @@ class RoomViewmodel : ViewModel() {
             val data = args.getOrNull(0) as? JSONObject
             viewModelScope.launch {
                 _roomData.value = data
+                updateChatFromJsonArray(data?.getJSONArray("chatInfo"))
             }
         }
 
@@ -63,6 +68,72 @@ class RoomViewmodel : ViewModel() {
             val data = args.getOrNull(0) as? JSONObject
             viewModelScope.launch {
                 _roomData.value = data
+                updateChatFromJsonArray(data?.getJSONArray("chatInfo"))
+            }
+        }
+
+        socket.on("updated-chat") { args ->
+            val chatArray = args.getOrNull(0) as? JSONArray ?: return@on
+            viewModelScope.launch {
+                updateChatFromJsonArray(chatArray)
+            }
+        }
+    }
+
+    private fun updateChatFromJsonArray(array: JSONArray?){
+        if (array == null) return
+        _messages.clear()
+        for (i in 0 until array.length()){
+            val obj = array.getJSONObject(i)
+            val name = obj.optString("name", "Unknown")
+            val message = obj.optString("message", "")
+            val timeLong = try {
+                obj.getLong("time")
+            } catch (e: Exception) {
+                // if backend already sent formatted string, try to parse it (fallback)
+                System.currentTimeMillis()
+            }
+            _messages.add(
+                ChatMessage(
+                    name = name,
+                    message = message,
+                    time = timeLong,
+                    isAdmin = obj.optBoolean("isAdmin", false),
+                    isMod = obj.optBoolean("isMod", false)
+                )
+            )
+        }
+    }
+
+    fun formatUnixTimeToHHmm(timestampMillis: Long): String {
+        val date = java.util.Date(timestampMillis)
+        val sdf = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
+        return sdf.format(date)
+    }
+
+
+    fun sendMessage(roomCode: String, name: String, message: String) {
+        if (message.isBlank()) return
+        viewModelScope.launch {
+            try {
+                if (!::socket.isInitialized || !socket.connected()) {
+                    SocketHandler.connect()
+                    delay(200)
+                }
+
+                val data = JSONObject().apply {
+                    put("roomCode", roomCode)
+                    put("name", name)
+                    put("message", message)
+                    put("isAdmin", false)
+                    put("isMod", false)
+                    put("time", System.currentTimeMillis())
+                }
+
+                socket.emit("send-message", data)
+                Log.d("SocketEmit", "send-message -> $data")
+            } catch (e: Exception) {
+                Log.e("RoomViewmodel", "sendMessage error: ${e.message}")
             }
         }
     }
@@ -72,6 +143,7 @@ class RoomViewmodel : ViewModel() {
     }
 
     fun createRoom(name: String, roomName: String) {
+        _myName = name
         viewModelScope.launch {
             try {
                 if (!::socket.isInitialized || !socket.connected()) {
@@ -91,6 +163,7 @@ class RoomViewmodel : ViewModel() {
             }
         }
     }
+
 
     fun joinRoom(name: String, roomCode: String) {
         viewModelScope.launch {

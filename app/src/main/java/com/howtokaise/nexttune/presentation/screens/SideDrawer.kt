@@ -22,20 +22,19 @@ import androidx.compose.ui.unit.dp
 fun SideDrawer() {
     Background {}
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box() {
 
-            }
-            Text("kya haal hai bhai", color = Color.White)
         }
-
-
+        Text("kya haal hai bhai", color = Color.White)
+    }
 }
+
 @Composable
 fun Background(content: @Composable BoxScope.() -> Unit) {
     Box(

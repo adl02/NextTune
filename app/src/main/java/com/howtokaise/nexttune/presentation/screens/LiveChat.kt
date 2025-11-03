@@ -1,6 +1,7 @@
 package com.howtokaise.nexttune.presentation.screens
 
 import AnimatedGlowingBackground
+import android.widget.Toast
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,15 +34,18 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,10 +54,21 @@ import kotlinx.coroutines.delay
 
 
 @Composable
-fun LiveChat(viewmodel: RoomViewmodel) {
+fun LiveChat(viewmodel: RoomViewmodel, loggedInName: String? = null) {
 
-    var message by remember { mutableStateOf("") }
     val messages = viewmodel.messages
+    val roomJson by viewmodel.roomData.collectAsState()
+
+    val myNameFromRoom = roomJson?.optString("myName")
+    val myName = viewmodel.myName ?: loggedInName ?: myNameFromRoom ?: "Me"
+
+    val roomCodeString = roomJson?.optInt("roomCode")?.toString()
+
+    val listState = rememberLazyListState()
+    val context = LocalContext.current
+
+    var message by rememberSaveable { mutableStateOf("") }
+
     AnimatedGlowingBackground {
         Column(
             modifier = Modifier
@@ -95,6 +111,7 @@ fun LiveChat(viewmodel: RoomViewmodel) {
                 TypingDotsAnimation()
             }
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
@@ -115,7 +132,7 @@ fun LiveChat(viewmodel: RoomViewmodel) {
                                 )
                                 .background(Color.Transparent, shape = CircleShape),
                             contentAlignment = Alignment.Center
-                        ){
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
@@ -136,7 +153,8 @@ fun LiveChat(viewmodel: RoomViewmodel) {
                                 Spacer(modifier = Modifier.width(4.dp))
 
                                 Text(
-                                    text = chatItem.time, fontSize = 11.sp, color = Color.LightGray
+                                    text = viewmodel.formatUnixTimeToHHmm(chatItem.time),
+                                    fontSize = 11.sp, color = Color.LightGray
                                 )
                             }
                             Text(
@@ -145,6 +163,12 @@ fun LiveChat(viewmodel: RoomViewmodel) {
                             )
                         }
                     }
+                }
+            }
+
+            LaunchedEffect(messages.size){
+                if (messages.isNotEmpty()){
+                    listState.animateScrollToItem(messages.size-1)
                 }
             }
 
@@ -188,8 +212,7 @@ fun LiveChat(viewmodel: RoomViewmodel) {
                                 Brush.horizontalGradient(
                                     colors = listOf(Color(0xFF00C6FF), Color(0xFF0072FF))
                                 )
-                            )
-                            .clickable { },
+                            ),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -197,6 +220,19 @@ fun LiveChat(viewmodel: RoomViewmodel) {
                             contentDescription = "Send",
                             tint = Color.White,
                             modifier = Modifier.size(35.dp)
+                                .clickable {
+                                    if (roomCodeString.isNullOrEmpty()){
+                                        Toast.makeText(context, "join or create a room first", Toast.LENGTH_SHORT).show()
+                                        return@clickable
+                                    }
+                                    if (message.isBlank()) return@clickable
+                                    viewmodel.sendMessage(
+                                        roomCode = roomCodeString,
+                                        name = myName,
+                                        message = message
+                                    )
+                                    message = ""
+                                }
                         )
                     }
                 }

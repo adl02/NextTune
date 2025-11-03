@@ -36,11 +36,12 @@ fun SplashScreen(navHostController: NavHostController) {
                     )
                 )
             )
-    ){
-        Column (modifier = Modifier.fillMaxSize(),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
-        ){
+        ) {
             Image(
                 painterResource(id = R.drawable.appicon),
                 contentDescription = "slap",
@@ -66,8 +67,8 @@ fun SplashScreen(navHostController: NavHostController) {
     }
     LaunchedEffect(Unit) {
         delay(1500)
-        navHostController.navigate(Route.HomeScreen.route){
-            popUpTo(Route.SplashScreen.route){
+        navHostController.navigate(Route.HomeScreen.route) {
+            popUpTo(Route.SplashScreen.route) {
                 inclusive = true
             }
         }
