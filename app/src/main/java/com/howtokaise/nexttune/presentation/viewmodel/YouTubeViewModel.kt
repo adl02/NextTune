@@ -1,4 +1,4 @@
-package com.howtokaise.nexttune.presentation
+package com.howtokaise.nexttune.presentation.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.getValue
