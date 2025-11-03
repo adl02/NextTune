@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,11 +37,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.R
-import com.howtokaise.nexttune.domain.data.people
+import com.howtokaise.nexttune.domain.data.UserInfo
+import com.howtokaise.nexttune.presentation.viewmodel.RoomViewmodel
 
 
 @Composable
-fun Participants(navHostController: NavHostController) {
+fun Participants(
+    navController: NavHostController,
+    viewmodel: RoomViewmodel
+) {
+
+    val participants by viewmodel.participants.collectAsState()
+
     AnimatedGlowingBackground {
         Column(
             modifier = Modifier
@@ -80,60 +89,98 @@ fun Participants(navHostController: NavHostController) {
                 Spacer(modifier = Modifier.weight(1f))
 
                 ParticipantCount(
-                    count = 3,
+                    count = participants.size,
                     onClick = {}
                 )
                 Spacer(modifier = Modifier.width(10.dp))
             }
 
-            LazyColumn (
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(12.dp))
-            ){
-                items(people){ chatItem ->
-                    Row(
-                        modifier = Modifier.padding(start = 15.dp, top = 8.dp, end = 22.dp, bottom = 8.dp)
+            ) {
+                items(
+                    items = participants,
+                    key = { it.userId }
+                ) { user ->
+                    ParticipantRow(user = user)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ParticipantRow(user: UserInfo) {
+    Row(
+        modifier = Modifier.padding(start = 15.dp, top = 8.dp, end = 22.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(50.dp)
+                .border(
+                    width = 0.4.dp,
+                    Color.Cyan,
+                    shape = CircleShape
+                )
+                .background(Color.Transparent, shape = CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = null,
+                modifier = Modifier.size(30.dp),
+                tint = if (user.isLeft) Color.Gray else Color.White
+            )
+        }
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = user.name,
+                    color = if (user.isLeft) Color.Gray else Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                if (user.isHost) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0x33FFD700), shape = RoundedCornerShape(6.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(50.dp)
-                                .border(
-                                    width = 0.4.dp,
-                                    Color.Cyan,
-                                    shape = CircleShape
-                                )
-                                .background(Color.Transparent, shape = CircleShape),
-                            contentAlignment = Alignment.Center
-                        ){
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = null,
-                                modifier = Modifier.size(30.dp)
-                            )
-                        }
+                        Text(text = "Host", fontSize = 11.sp, color = Color(0xFFFFD700))
+                    }
+                } else if (user.isMod) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0x3300FF00), shape = RoundedCornerShape(6.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(text = "Mod", fontSize = 11.sp, color = Color(0xFF00FF00))
+                    }
+                }
 
-                        Spacer(modifier = Modifier.width(10.dp))
-
-                        Column {
-                            Row {
-                                Text(
-                                    text = chatItem.name,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-
-                                Spacer(modifier = Modifier.width(4.dp))
-
-                            }
-                            Text(
-                                text = chatItem.status,
-                                color = Color.LightGray
-                            )
-                        }
+                if (user.isLeft) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0x33FF0000), shape = RoundedCornerShape(6.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(text = "Left", fontSize = 11.sp, color = Color.Red)
                     }
                 }
             }
+
+            Text(
+                text = user.status,
+                color = if (user.isLeft) Color.Gray else Color.LightGray
+            )
         }
     }
 }

@@ -8,9 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.howtokaise.nexttune.presentation.viewmodel.RoomViewmodel
 import com.howtokaise.nexttune.presentation.viewmodel.YouTubeViewModel
-import com.howtokaise.nexttune.presentation.screens.CreateRoom
 import com.howtokaise.nexttune.presentation.screens.HomeScreen
-import com.howtokaise.nexttune.presentation.screens.JoinRoom
 import com.howtokaise.nexttune.presentation.screens.MainScreen
 import com.howtokaise.nexttune.presentation.screens.MusicList
 import com.howtokaise.nexttune.presentation.screens.Participants
@@ -40,7 +38,7 @@ fun NavGraph(
             MusicList(youTubeVm)
         }
         composable(Route.Participants.route){
-           Participants(navController)
+           Participants(navController, viewmodel = roomViewmodel)
         }
         composable(Route.SideDrawer.route){
             SideDrawer()

@@ -6,6 +6,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.howtokaise.nexttune.domain.data.ChatMessage
+import com.howtokaise.nexttune.domain.data.UserInfo
 import com.howtokaise.nexttune.domain.socket.SocketHandler
 import io.socket.client.Socket
 import kotlinx.coroutines.delay
@@ -18,6 +19,20 @@ import org.json.JSONObject
 class RoomViewmodel : ViewModel() {
 
     private lateinit var socket: Socket
+
+    // at top of RoomViewmodel
+    private val _participants = MutableStateFlow<List<UserInfo>>(emptyList())
+    val participants = _participants.asStateFlow()
+
+    // In RoomViewmodel.kt - Add these state variables
+    private val _isAdmin = MutableStateFlow(false)
+    val isAdmin = _isAdmin.asStateFlow()
+
+    private val _isMod = MutableStateFlow(false)
+    val isMod = _isMod.asStateFlow()
+
+    private val _currentUser = MutableStateFlow<UserInfo?>(null)
+    val currentUser = _currentUser.asStateFlow()
 
     private val _roomData = MutableStateFlow<JSONObject?>(null)
     val roomData = _roomData.asStateFlow()
@@ -57,8 +72,19 @@ class RoomViewmodel : ViewModel() {
             Log.d("SocketEvent", "room-created -> $args")
             val data = args.getOrNull(0) as? JSONObject
             viewModelScope.launch {
+                _participants.value = parseUsersArray(data?.optJSONArray("users"))
                 _roomData.value = data
                 updateChatFromJsonArray(data?.getJSONArray("chatInfo"))
+                _isAdmin.value = true // Admin created the room
+                _isMod.value = true
+
+                // Set current user info for admin
+                val users = parseUsersArray(data?.optJSONArray("users"))
+                val adminUser = users.find { it.isHost }
+                adminUser?.let {
+                    _currentUser.value = it
+                    _myName = it.name
+                }
             }
         }
 
@@ -67,8 +93,22 @@ class RoomViewmodel : ViewModel() {
             Log.d("SocketEvent", "user-joined -> $args")
             val data = args.getOrNull(0) as? JSONObject
             viewModelScope.launch {
+                val serverUsers = parseUsersArray(data?.optJSONArray("users"))
+                _participants.value = serverUsers
                 _roomData.value = data
                 updateChatFromJsonArray(data?.getJSONArray("chatInfo"))
+                _isAdmin.value = data?.optBoolean("isAdmin") ?: false
+                _isMod.value = data?.optBoolean("isMod") ?: false
+
+                // Set current user info for participant
+                val myNameFromData = data?.optString("myName")
+                myNameFromData?.let { name ->
+                    _myName = name
+                    val currentUserInfo = serverUsers.find { it.name == name }
+                    currentUserInfo?.let {
+                        _currentUser.value = it
+                    }
+                }
             }
         }
 
@@ -76,6 +116,34 @@ class RoomViewmodel : ViewModel() {
             val chatArray = args.getOrNull(0) as? JSONArray ?: return@on
             viewModelScope.launch {
                 updateChatFromJsonArray(chatArray)
+            }
+        }
+
+        // Add this to your attachListeners function in RoomViewmodel
+        socket.on("sync-users") { args ->
+            val array = args.getOrNull(0) as? JSONArray
+            viewModelScope.launch {
+                _participants.value = parseUsersArray(array)
+            }
+        }
+
+        socket.on("user-left") { args ->
+            val userId = args.getOrNull(0) as? String
+            viewModelScope.launch {
+                _participants.value = _participants.value.map { user ->
+                    if (user.userId == userId) {
+                        user.copy(status = "Left", isLeft = true)
+                    } else {
+                        user
+                    }
+                }
+            }
+        }
+
+        socket.on("participants-updated") { args ->
+            val array = args.getOrNull(0) as? JSONArray
+            viewModelScope.launch {
+                _participants.value = parseUsersArray(array)
             }
         }
     }
@@ -111,7 +179,7 @@ class RoomViewmodel : ViewModel() {
         return sdf.format(date)
     }
 
-
+    // Update sendMessage function in RoomViewmodel
     fun sendMessage(roomCode: String, name: String, message: String) {
         if (message.isBlank()) return
         viewModelScope.launch {
@@ -125,8 +193,8 @@ class RoomViewmodel : ViewModel() {
                     put("roomCode", roomCode)
                     put("name", name)
                     put("message", message)
-                    put("isAdmin", false)
-                    put("isMod", false)
+                    put("isAdmin", _isAdmin.value) // Use the actual admin status
+                    put("isMod", _isMod.value)    // Use the actual mod status
                     put("time", System.currentTimeMillis())
                 }
 
@@ -138,8 +206,25 @@ class RoomViewmodel : ViewModel() {
         }
     }
 
-    fun clearRoomData() {
-        viewModelScope.launch { _roomData.value = null }
+    fun clearRoomData() { viewModelScope.launch { _roomData.value = null } }
+
+    private fun parseUsersArray(array: JSONArray?): List<UserInfo> {
+        if (array == null) return emptyList()
+        val list = mutableListOf<UserInfo>()
+        for (i in 0 until array.length()) {
+            val obj = array.optJSONObject(i) ?: continue
+            list.add(
+                UserInfo(
+                    name = obj.optString("name", "Unknown"),
+                    userId = obj.optString("userId", obj.optString("id", "user-${System.currentTimeMillis()}")),
+                    isHost = obj.optBoolean("isHost", false),
+                    isMod = obj.optBoolean("isMod", false),
+                    status = obj.optString("status", "watching"),
+                    isLeft = obj.optBoolean("isLeft", false)
+                )
+            )
+        }
+        return list
     }
 
     fun createRoom(name: String, roomName: String) {
@@ -156,8 +241,18 @@ class RoomViewmodel : ViewModel() {
                     put("name", name)
                     put("roomName", roomName)
                 }
-                Log.d("SocketEmit", "emit create-room -> $data")
                 socket.emit("create-room", data)
+
+                // Create temporary admin user with proper host flag
+                val adminUser = UserInfo(
+                    name = name,
+                    userId = "admin-temp", // This will be updated when room-created is received
+                    isHost = true,
+                    isMod = true,
+                    status = "watching"
+                )
+                _currentUser.value = adminUser
+                _participants.value = listOf(adminUser)
             } catch (e: Exception) {
                 Log.e("RoomViewmodel", "createRoom error: ${e.message}")
             }

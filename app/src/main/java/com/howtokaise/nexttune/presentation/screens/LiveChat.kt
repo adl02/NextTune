@@ -58,9 +58,13 @@ fun LiveChat(viewmodel: RoomViewmodel, loggedInName: String? = null) {
 
     val messages = viewmodel.messages
     val roomJson by viewmodel.roomData.collectAsState()
+    val isAdmin by viewmodel.isAdmin.collectAsState()
+    val isMod by viewmodel.isMod.collectAsState()
+    val currentUser by viewmodel.currentUser.collectAsState()
 
-    val myNameFromRoom = roomJson?.optString("myName")
-    val myName = viewmodel.myName ?: loggedInName ?: myNameFromRoom ?: "Me"
+    // Get the correct name with priority: currentUser > myName > loggedInName > room data
+    val myName = currentUser?.name ?: viewmodel.myName ?: loggedInName ?:
+    roomJson?.optString("myName") ?: "Unknown User"
 
     val roomCodeString = roomJson?.optInt("roomCode")?.toString()
 
@@ -136,7 +140,8 @@ fun LiveChat(viewmodel: RoomViewmodel, loggedInName: String? = null) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = null,
-                                modifier = Modifier.size(30.dp)
+                                modifier = Modifier.size(30.dp),
+                                tint = Color.White
                             )
                         }
 

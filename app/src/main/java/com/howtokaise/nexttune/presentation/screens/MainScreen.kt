@@ -26,6 +26,8 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +52,7 @@ import com.howtokaise.nexttune.presentation.youtube.YouTubeThumbnail
 fun MainScreen(navHostController: NavHostController, viewmodel: RoomViewmodel) {
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = {2})
+    val participant by viewmodel.participants.collectAsState()
 
     AnimatedGlowingBackground {
         Column(
@@ -93,7 +96,7 @@ fun MainScreen(navHostController: NavHostController, viewmodel: RoomViewmodel) {
                 Spacer(modifier = Modifier.weight(1f))
 
                 ParticipantCount(
-                    count = 3,
+                    count = participant.size,
                     onClick = {
                         navHostController.navigate(Route.Participants.route)
                     }
