@@ -4,9 +4,6 @@ import AnimatedGlowingBackground
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,14 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -53,6 +49,11 @@ fun MainScreen(navHostController: NavHostController, viewmodel: RoomViewmodel) {
 
     val pagerState = rememberPagerState(initialPage = 0, pageCount = {2})
     val participant by viewmodel.participants.collectAsState()
+    val isSettingsOpen by viewmodel.isSettingsOpen.collectAsState()
+
+    if (isSettingsOpen) {
+        SettingScreen(viewmodel = viewmodel, navController = navHostController)
+    }
 
     AnimatedGlowingBackground {
         Column(
@@ -104,12 +105,22 @@ fun MainScreen(navHostController: NavHostController, viewmodel: RoomViewmodel) {
 
                 Spacer(modifier = Modifier.width(19.dp))
 
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(35.dp)
-                )
+                IconButton(
+                    onClick = {
+                        if (isSettingsOpen) {
+                            viewmodel.closeSettings()
+                        } else {
+                            viewmodel.openSettings()
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (isSettingsOpen) Icons.Default.Close else Icons.Default.Menu,
+                        contentDescription = if (isSettingsOpen) "Close Settings" else "Open Settings",
+                        tint = Color.White,
+                        modifier = Modifier.size(35.dp)
+                    )
+                }
             }
 
             Column(

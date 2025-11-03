@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.domain.data.ChatMessage
 import com.howtokaise.nexttune.domain.data.UserInfo
 import com.howtokaise.nexttune.domain.socket.SocketHandler
@@ -20,11 +21,23 @@ class RoomViewmodel : ViewModel() {
 
     private lateinit var socket: Socket
 
-    // at top of RoomViewmodel
+    private val _isSettingsOpen = MutableStateFlow(false)
+    val isSettingsOpen = _isSettingsOpen.asStateFlow()
+
+    private val _showLeaveDialog = MutableStateFlow(false)
+    val showLeaveDialog = _showLeaveDialog.asStateFlow()
+
+    fun openSettings() { _isSettingsOpen.value = true }
+
+    fun closeSettings() { _isSettingsOpen.value = false }
+
+    fun showLeaveConfirmation() { _showLeaveDialog.value = true }
+
+    fun hideLeaveConfirmation() { _showLeaveDialog.value = false }
+
     private val _participants = MutableStateFlow<List<UserInfo>>(emptyList())
     val participants = _participants.asStateFlow()
 
-    // In RoomViewmodel.kt - Add these state variables
     private val _isAdmin = MutableStateFlow(false)
     val isAdmin = _isAdmin.asStateFlow()
 
@@ -179,7 +192,6 @@ class RoomViewmodel : ViewModel() {
         return sdf.format(date)
     }
 
-    // Update sendMessage function in RoomViewmodel
     fun sendMessage(roomCode: String, name: String, message: String) {
         if (message.isBlank()) return
         viewModelScope.launch {
@@ -259,7 +271,6 @@ class RoomViewmodel : ViewModel() {
         }
     }
 
-
     fun joinRoom(name: String, roomCode: String) {
         viewModelScope.launch {
             try {
@@ -277,6 +288,32 @@ class RoomViewmodel : ViewModel() {
                 socket.emit("join-room", data)
             } catch (e: Exception) {
                 Log.e("RoomViewmodel", "joinRoom error: ${e.message}")
+            }
+        }
+    }
+
+    fun leaveRoom(navController: NavHostController? = null) {
+        viewModelScope.launch {
+            try {
+                SocketHandler.disconnect()
+
+                // Clear all room data
+                _roomData.value = null
+                _participants.value = emptyList()
+                _messages.clear()
+                _isAdmin.value = false
+                _isMod.value = false
+                _currentUser.value = null
+                _myName = null
+                _isSettingsOpen.value = false
+                _showLeaveDialog.value = false
+
+                // Navigate to home screen
+                navController?.navigate(com.howtokaise.nexttune.domain.navigation.Route.HomeScreen.route) {
+                    popUpTo(com.howtokaise.nexttune.domain.navigation.Route.MainScreen.route) { inclusive = true }
+                }
+            } catch (e: Exception) {
+                Log.e("RoomViewmodel", "leaveRoom error: ${e.message}")
             }
         }
     }

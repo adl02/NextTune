@@ -12,7 +12,7 @@ import com.howtokaise.nexttune.presentation.screens.HomeScreen
 import com.howtokaise.nexttune.presentation.screens.MainScreen
 import com.howtokaise.nexttune.presentation.screens.MusicList
 import com.howtokaise.nexttune.presentation.screens.Participants
-import com.howtokaise.nexttune.presentation.screens.SideDrawer
+import com.howtokaise.nexttune.presentation.screens.SettingScreen
 import com.howtokaise.nexttune.presentation.screens.SplashScreen
 
 @SuppressLint("ViewModelConstructorInComposable")
@@ -39,9 +39,6 @@ fun NavGraph(
         }
         composable(Route.Participants.route){
            Participants(navController, viewmodel = roomViewmodel)
-        }
-        composable(Route.SideDrawer.route){
-            SideDrawer()
         }
     }
 }
