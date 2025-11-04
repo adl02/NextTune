@@ -36,20 +36,25 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.R
 import com.howtokaise.nexttune.domain.navigation.Route
 import com.howtokaise.nexttune.presentation.viewmodel.RoomViewmodel
 import com.howtokaise.nexttune.presentation.viewmodel.YouTubeViewModel
+import com.howtokaise.nexttune.presentation.youtube.YouTubePlayerComposable
 import com.howtokaise.nexttune.presentation.youtube.YouTubeThumbnail
 
 @SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun MainScreen(navHostController: NavHostController, viewmodel: RoomViewmodel) {
 
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = {2})
+    val youtubeViewModel: YouTubeViewModel = viewModel()
+
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 2 })
     val participant by viewmodel.participants.collectAsState()
     val isSettingsOpen by viewmodel.isSettingsOpen.collectAsState()
+    val currentVideoId by viewmodel.currentVideoId.collectAsState()
 
     if (isSettingsOpen) {
         SettingScreen(viewmodel = viewmodel, navController = navHostController)
@@ -128,13 +133,17 @@ fun MainScreen(navHostController: NavHostController, viewmodel: RoomViewmodel) {
                     .fillMaxSize()
                     .padding(5.dp)
             ) {
-                // YouTubePlayerComposable(videoId = "C5AGwYeItUk") // youtube new policy
+               // YouTubePlayerComposable(videoId = currentVideoId) // youtube new policy
                 YouTubeThumbnail(imageId = "TBxS0XhdfmU")
 
-                HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) {page->
-                    when(page){
+                HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+                    when (page) {
                         0 -> LiveChat(viewmodel)
-                        1 -> MusicList(YouTubeViewModel())
+                        1 -> MusicList(
+                            roomViewModel = viewmodel,
+                            youtubeViewModel = youtubeViewModel,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                 }
             }

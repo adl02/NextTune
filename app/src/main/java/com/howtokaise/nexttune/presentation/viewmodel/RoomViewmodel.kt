@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.howtokaise.nexttune.domain.data.ChatMessage
 import com.howtokaise.nexttune.domain.data.UserInfo
+import com.howtokaise.nexttune.domain.data.VideoItem
 import com.howtokaise.nexttune.domain.socket.SocketHandler
 import io.socket.client.Socket
 import kotlinx.coroutines.delay
@@ -21,20 +22,14 @@ class RoomViewmodel : ViewModel() {
 
     private lateinit var socket: Socket
 
+    // Setting states
     private val _isSettingsOpen = MutableStateFlow(false)
     val isSettingsOpen = _isSettingsOpen.asStateFlow()
 
     private val _showLeaveDialog = MutableStateFlow(false)
     val showLeaveDialog = _showLeaveDialog.asStateFlow()
 
-    fun openSettings() { _isSettingsOpen.value = true }
-
-    fun closeSettings() { _isSettingsOpen.value = false }
-
-    fun showLeaveConfirmation() { _showLeaveDialog.value = true }
-
-    fun hideLeaveConfirmation() { _showLeaveDialog.value = false }
-
+    // Room States
     private val _participants = MutableStateFlow<List<UserInfo>>(emptyList())
     val participants = _participants.asStateFlow()
 
@@ -53,8 +48,20 @@ class RoomViewmodel : ViewModel() {
     private val _messages = mutableStateListOf<ChatMessage>()
     val messages: SnapshotStateList<ChatMessage> = _messages
 
-    private var listenersAttached = false
+    // Video states
+    private val _currentVideoId = MutableStateFlow("")
+    val currentVideoId = _currentVideoId.asStateFlow()
 
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
+    private val _currentTime = MutableStateFlow(0f)
+    val currentTime = _currentTime.asStateFlow()
+
+    private val _videoQueue = MutableStateFlow<List<VideoItem>>(emptyList())
+    val videoQueue = _videoQueue.asStateFlow()
+
+    private var listenersAttached = false
     private var _myName: String? = null
     val myName: String? get() = _myName
 
@@ -88,8 +95,16 @@ class RoomViewmodel : ViewModel() {
                 _participants.value = parseUsersArray(data?.optJSONArray("users"))
                 _roomData.value = data
                 updateChatFromJsonArray(data?.getJSONArray("chatInfo"))
-                _isAdmin.value = true // Admin created the room
+                _isAdmin.value = true
                 _isMod.value = true
+
+                // Video info handle karein
+                val videoInfo = data?.optJSONObject("videoInfo")
+                videoInfo?.let {
+                    _currentVideoId.value = it.optString("currentVideoId", "")
+                    _isPlaying.value = it.optBoolean("isPlaying", false)
+                    _videoQueue.value = parseVideoQueue(it.optJSONArray("queue"))
+                }
 
                 // Set current user info for admin
                 val users = parseUsersArray(data?.optJSONArray("users"))
@@ -113,6 +128,14 @@ class RoomViewmodel : ViewModel() {
                 _isAdmin.value = data?.optBoolean("isAdmin") ?: false
                 _isMod.value = data?.optBoolean("isMod") ?: false
 
+                // Video info handle karein
+                val videoInfo = data?.optJSONObject("videoInfo")
+                videoInfo?.let {
+                    _currentVideoId.value = it.optString("currentVideoId", "")
+                    _isPlaying.value = it.optBoolean("isPlaying", false)
+                    _videoQueue.value = parseVideoQueue(it.optJSONArray("queue"))
+                }
+
                 // Set current user info for participant
                 val myNameFromData = data?.optString("myName")
                 myNameFromData?.let { name ->
@@ -132,7 +155,55 @@ class RoomViewmodel : ViewModel() {
             }
         }
 
-        // Add this to your attachListeners function in RoomViewmodel
+        // Video sync listeners
+        socket.on("sync-play-video") { args ->
+            val data = args.getOrNull(0) as? JSONObject
+            viewModelScope.launch {
+                val videoId = data?.optString("videoId")
+                val currentTime = data?.optDouble("currentTime")?.toFloat() ?: 0f
+
+                if (!videoId.isNullOrEmpty()) {
+                    _currentVideoId.value = videoId
+                }
+                _isPlaying.value = true
+                _currentTime.value = currentTime
+
+                Log.d("VideoSync", "Play video: $videoId, time: $currentTime")
+            }
+        }
+
+        socket.on("sync-pause-video") { args ->
+            viewModelScope.launch {
+                _isPlaying.value = false
+                Log.d("VideoSync", "Video paused")
+            }
+        }
+
+        socket.on("sync-play-from-queue") { args ->
+            val data = args.getOrNull(0) as? JSONObject
+            viewModelScope.launch {
+                val videoId = data?.optString("videoId")
+                val currentTime = data?.optDouble("currentTime")?.toFloat() ?: 0f
+
+                if (!videoId.isNullOrEmpty()) {
+                    _currentVideoId.value = videoId
+                }
+                _isPlaying.value = true
+                _currentTime.value = currentTime
+
+                Log.d("VideoSync", "Play from queue: $videoId, time: $currentTime")
+            }
+        }
+
+        socket.on("queue-updated") { args ->
+            val queueArray = args.getOrNull(0) as? JSONArray
+            viewModelScope.launch {
+                val updatedQueue = parseVideoQueue(queueArray)
+                _videoQueue.value = updatedQueue
+                Log.d("VideoSync", "Queue updated: ${updatedQueue.size} videos")
+            }
+        }
+
         socket.on("sync-users") { args ->
             val array = args.getOrNull(0) as? JSONArray
             viewModelScope.launch {
@@ -161,6 +232,92 @@ class RoomViewmodel : ViewModel() {
         }
     }
 
+    // Video control functions
+
+    fun searchAndAddVideo(query: String, youtubeViewModel: YouTubeViewModel) {
+        viewModelScope.launch {
+            youtubeViewModel.search(query)
+        }
+    }
+
+    fun playNextVideoInQueue() {
+        val queue = _videoQueue.value
+        if (queue.isNotEmpty()) {
+            val nextVideo = queue.first()
+            playVideoFromQueue(nextVideo.videoId)
+        }
+    }
+
+    fun playVideo(videoId: String? = null) {
+        if (videoId != null) {
+            _currentVideoId.value = videoId
+        }
+
+        val roomCode = _roomData.value?.optInt("roomCode")?.toString() ?: return
+        if (_isAdmin.value || _isMod.value) {
+            socket.emit("sync-play-video", JSONObject().apply {
+                put("roomCode", roomCode)
+                put("currentVideoId", videoId ?: _currentVideoId.value)
+            })
+        }
+        _isPlaying.value = true
+    }
+
+    fun pauseVideo() {
+        val roomCode = _roomData.value?.optInt("roomCode")?.toString() ?: return
+        if (_isAdmin.value || _isMod.value) {
+            socket.emit("sync-pause-video", JSONObject().apply {
+                put("roomCode", roomCode)
+            })
+        }
+        _isPlaying.value = false
+    }
+
+    fun seekTo(time: Float) {
+        _currentTime.value = time
+    }
+
+    fun addVideoToQueue(videoItem: VideoItem) {
+        val roomCode = _roomData.value?.optInt("roomCode")?.toString() ?: return
+        val vdoJson = JSONObject().apply {
+            put("id", JSONObject().apply {
+                put("videoId", videoItem.videoId)
+            })
+            put("snippet", JSONObject().apply {
+                put("title", videoItem.title)
+                put("thumbnails", JSONObject().apply {
+                    put("default", JSONObject().apply {
+                        put("url", videoItem.thumbnailUrl)
+                    })
+                })
+            })
+        }
+
+        socket.emit("add-video-id-to-queue", JSONObject().apply {
+            put("vdo", vdoJson)
+            put("roomCode", roomCode)
+        })
+    }
+
+    fun removeVideoFromQueue(videoId: String) {
+        val roomCode = _roomData.value?.optInt("roomCode")?.toString() ?: return
+        socket.emit("remove-video-from-queue", JSONObject().apply {
+            put("videoId", videoId)
+            put("roomCode", roomCode)
+        })
+    }
+
+    fun playVideoFromQueue(videoId: String) {
+        val roomCode = _roomData.value?.optInt("roomCode")?.toString() ?: return
+        if (_isAdmin.value || _isMod.value) {
+            socket.emit("play-video-from-queue", JSONObject().apply {
+                put("videoId", videoId)
+                put("roomCode", roomCode)
+            })
+        }
+    }
+
+    // Helper functions
     private fun updateChatFromJsonArray(array: JSONArray?){
         if (array == null) return
         _messages.clear()
@@ -171,7 +328,6 @@ class RoomViewmodel : ViewModel() {
             val timeLong = try {
                 obj.getLong("time")
             } catch (e: Exception) {
-                // if backend already sent formatted string, try to parse it (fallback)
                 System.currentTimeMillis()
             }
             _messages.add(
@@ -184,6 +340,48 @@ class RoomViewmodel : ViewModel() {
                 )
             )
         }
+    }
+
+    private fun parseVideoQueue(array: JSONArray?): List<VideoItem> {
+        if (array == null) return emptyList()
+        val queue = mutableListOf<VideoItem>()
+        for (i in 0 until array.length()) {
+            val obj = array.optJSONObject(i) ?: continue
+            val idObj = obj.optJSONObject("id")
+            val snippetObj = obj.optJSONObject("snippet")
+
+            if (idObj != null && snippetObj != null) {
+                queue.add(
+                    VideoItem(
+                        videoId = idObj.optString("videoId", ""),
+                        title = snippetObj.optString("title", "Unknown Title"),
+                        thumbnailUrl = snippetObj.optJSONObject("thumbnails")
+                            ?.optJSONObject("default")
+                            ?.optString("url", "") ?: ""
+                    )
+                )
+            }
+        }
+        return queue
+    }
+
+    private fun parseUsersArray(array: JSONArray?): List<UserInfo> {
+        if (array == null) return emptyList()
+        val list = mutableListOf<UserInfo>()
+        for (i in 0 until array.length()) {
+            val obj = array.optJSONObject(i) ?: continue
+            list.add(
+                UserInfo(
+                    name = obj.optString("name", "Unknown"),
+                    userId = obj.optString("userId", obj.optString("id", "user-${System.currentTimeMillis()}")),
+                    isHost = obj.optBoolean("isHost", false),
+                    isMod = obj.optBoolean("isMod", false),
+                    status = obj.optString("status", "watching"),
+                    isLeft = obj.optBoolean("isLeft", false)
+                )
+            )
+        }
+        return list
     }
 
     fun formatUnixTimeToHHmm(timestampMillis: Long): String {
@@ -219,25 +417,6 @@ class RoomViewmodel : ViewModel() {
     }
 
     fun clearRoomData() { viewModelScope.launch { _roomData.value = null } }
-
-    private fun parseUsersArray(array: JSONArray?): List<UserInfo> {
-        if (array == null) return emptyList()
-        val list = mutableListOf<UserInfo>()
-        for (i in 0 until array.length()) {
-            val obj = array.optJSONObject(i) ?: continue
-            list.add(
-                UserInfo(
-                    name = obj.optString("name", "Unknown"),
-                    userId = obj.optString("userId", obj.optString("id", "user-${System.currentTimeMillis()}")),
-                    isHost = obj.optBoolean("isHost", false),
-                    isMod = obj.optBoolean("isMod", false),
-                    status = obj.optString("status", "watching"),
-                    isLeft = obj.optBoolean("isLeft", false)
-                )
-            )
-        }
-        return list
-    }
 
     fun createRoom(name: String, roomName: String) {
         _myName = name
@@ -291,6 +470,15 @@ class RoomViewmodel : ViewModel() {
             }
         }
     }
+
+    // Setting functions
+    fun openSettings() { _isSettingsOpen.value = true }
+
+    fun closeSettings() { _isSettingsOpen.value = false }
+
+    fun showLeaveConfirmation() { _showLeaveDialog.value = true }
+
+    fun hideLeaveConfirmation() { _showLeaveDialog.value = false }
 
     fun leaveRoom(navController: NavHostController? = null) {
         viewModelScope.launch {

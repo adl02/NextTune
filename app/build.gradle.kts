@@ -59,6 +59,10 @@ dependencies {
 
     //youtube player
     implementation ("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+    // coil
+    implementation ("io.coil-kt:coil-compose:2.7.0")
+    // For JSON parsing (if not already added)
+    implementation ("org.json:json:20231013")
     // navigation
     implementation(libs.androidx.navigation.compose)
     // retrofit
@@ -73,11 +77,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
     // gson
     implementation("com.google.code.gson:gson:2.10.1")
-// ViewModel & LiveData
+    // ViewModel & LiveData
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.9.4")
-    // coil
-    implementation ("io.coil-kt:coil-compose:2.7.0")
     //icon
     implementation("androidx.compose.material:material-icons-extended")
     // pager

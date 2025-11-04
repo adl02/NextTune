@@ -33,10 +33,6 @@ fun NavGraph(
         composable(Route.MainScreen.route){
             MainScreen(navController, viewmodel = roomViewmodel)
         }
-        composable(Route.MusicList.route){
-            val youTubeVm: YouTubeViewModel = viewModel()
-            MusicList(youTubeVm)
-        }
         composable(Route.Participants.route){
            Participants(navController, viewmodel = roomViewmodel)
         }

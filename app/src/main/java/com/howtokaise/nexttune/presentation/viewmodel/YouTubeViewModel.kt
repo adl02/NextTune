@@ -1,35 +1,42 @@
 package com.howtokaise.nexttune.presentation.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.howtokaise.nexttune.data.remote.api.RetrofitInstance
 import com.howtokaise.nexttune.domain.data.YouTubeSearchResponse
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class YouTubeViewModel : ViewModel() {
-    var results by mutableStateOf<List<YouTubeSearchResponse>>(emptyList())
-        private set
+    private val _results = MutableStateFlow<List<YouTubeSearchResponse>>(emptyList())
+    val results: StateFlow<List<YouTubeSearchResponse>> = _results.asStateFlow()
 
-    var  isLoading by mutableStateOf(false)
-        private set
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    var errorMessage by mutableStateOf<String?>(null)
-        private set
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-
-    fun search(query: String){
+    fun search(query: String) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _isLoading.value = true
+            _errorMessage.value = null
             try {
-                results = RetrofitInstance.api.searchVideos(query)
-            } catch (e : Exception){
-                Log.e("Search","Error :${e.message}")
+                _results.value = RetrofitInstance.api.searchVideos(query)
+            } catch (e: Exception) {
+                _errorMessage.value = "Search failed: ${e.message}"
+                Log.e("YouTubeSearch", "Error: ${e.message}")
+            } finally {
+                _isLoading.value = false
             }
         }
+    }
+
+    fun clearResults() {
+        _results.value = emptyList()
+        _errorMessage.value = null
     }
 }
