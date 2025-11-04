@@ -9,16 +9,18 @@
 NextTune synchronizes YouTube playback across multiple users while enabling real-time chatting and playlist control.  
 Perfect for music sessions, watch parties, or collaborative playlists!
 
+This Android app is built to work with the **NextTune Web backend**, developed by [@prakash-ydv](https://github.com/prakash-ydv), which powers real-time room management and video synchronization using **Socket.IO** and **Node.js**.
+
 ---
 
 ## ✨ Features
 
 - 🎥 **Synchronized YouTube Playback** — Everyone watches the same moment, together.
-- 💬 **Real-Time Chat** — Instant messaging within each room.
+- 💬 **Real-Time Chat** — Chat with other members instantly.
 - 🧩 **Create or Join Rooms** — Host private or public watch sessions.
 - 🎶 **Shared Queue** — Add, remove, or play songs collaboratively.
 - 🔒 **Secure Room Handling** — Unique room IDs and admin control.
-- 📱 **Clean, Modern UI** — Fully built with Jetpack Compose.
+- 📱 **Modern Jetpack Compose UI** — Clean, minimal, and responsive.
 
 ---
 
@@ -29,9 +31,20 @@ Perfect for music sessions, watch parties, or collaborative playlists!
 | 🧩 UI | **Jetpack Compose (Material 3)** |
 | 🎬 Video | **YouTube Player API** |
 | 🔗 Networking | **Retrofit + YouTube Data API v3** |
-| ⚡ Realtime | **Socket.IO (Node.js backend)** |
+| ⚡ Realtime | **Socket.IO (Node.js backend by [@prakash-ydv](https://github.com/prakash-ydv))** |
 | 🧠 Architecture | **MVVM + Coroutines + Flow** |
-| 💾 Local Storage | **Room Database** |
+
+---
+
+## 🌐 Backend Information
+
+The **backend & web version** of NextTune was developed by [@prakash-ydv](https://github.com/prakash-ydv)  
+using **Node.js**, **Express.js**, and **Socket.IO**, handling:
+- Room creation & synchronization
+- Real-time chat and video events
+- Integration with **YouTubePlayer API**
+
+My **Android version** connects to the same backend for a seamless cross-platform experience.
 
 ---
 
@@ -47,6 +60,16 @@ Perfect for music sessions, watch parties, or collaborative playlists!
 
 ---
 
-⭐ If you like this project, don’t forget to star the repo!
+## 👥 Credits
+
+- **Android App:** [@Adil Jawed](https://github.com/adl02)
+- **Backend & Web App:** [@prakash-ydv](https://github.com/prakash-ydv)
 
 ---
+
+## ⭐ If you like this project
+
+If you found **NextTune** helpful or inspiring, please ⭐ **star the repo** to support both developers!
+
+---
+
