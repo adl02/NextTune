@@ -233,7 +233,6 @@ class RoomViewmodel : ViewModel() {
     }
 
     // Video control functions
-
     fun searchAndAddVideo(query: String, youtubeViewModel: YouTubeViewModel) {
         viewModelScope.launch {
             youtubeViewModel.search(query)
