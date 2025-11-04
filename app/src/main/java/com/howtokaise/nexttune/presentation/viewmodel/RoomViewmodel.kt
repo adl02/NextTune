@@ -71,7 +71,7 @@ class RoomViewmodel : ViewModel() {
 
     fun connectToServer() {
         try {
-            SocketHandler.initSocket("http://192.168.1.4:3000")
+            SocketHandler.initSocket("https://nexttune.onrender.com")
             socket = SocketHandler.getSocket()
         } catch (e: Exception) {
             Log.e("RoomViewmodel", "Socket init error: ${e.message}")
