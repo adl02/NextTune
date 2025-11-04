@@ -1,41 +1,52 @@
-# 🚀 Coming Soon: NextTune
+# 🚀 NextTune
 
-**NextTune** is a collaborative YouTube streaming app where friends can create or join rooms to watch videos together and chat in real-time — just like you're in the same room, even when you're not.
-
-
-## 🎯 Key Features
-
-- 🎬 **Synchronized YouTube Playback**
-- 💬 **Real-Time Chat with Room Members**
-- 🧩 **Create or Join Custom Rooms**
-- 👥 **Watch Together, Stay Connected**
-- 🔒 **Secure Room Handling (with unique IDs or invite links)**
-
-## 🛠️ Tech Stack
-
-- **Jetpack Compose** – UI
-- **YouTube Player API** – Video playback
-- **Socket.IO** – Real-time communication
-- **Retrofit** – REST API integration
-- **Room DB** – Local storage
-- **MVVM Architecture**
-
-## 📱 Screenshots (Coming Soon)
-
-> UI/UX previews will be added once the first release is ready!
-
-## 📌 Status
-
-This project is currently under development. Stay tuned for more updates!
-
-## 🤝 Contributing
-
-Coming soon...
-
-## 📧 Contact
-
-For collaboration or suggestions: [mdadiljawed786@gmail.com]
+**NextTune** is a collaborative YouTube streaming app where friends can create or join rooms to watch videos together and chat in real-time — just like being in the same room, even when miles apart.
 
 ---
 
-✨ _Bringing people closer — one video at a time._
+## 🎬 Overview
+
+NextTune synchronizes YouTube playback across multiple users while enabling real-time chatting and playlist control.  
+Perfect for music sessions, watch parties, or collaborative playlists!
+
+---
+
+## ✨ Features
+
+- 🎥 **Synchronized YouTube Playback** — Everyone watches the same moment, together.
+- 💬 **Real-Time Chat** — Instant messaging within each room.
+- 🧩 **Create or Join Rooms** — Host private or public watch sessions.
+- 🎶 **Shared Queue** — Add, remove, or play songs collaboratively.
+- 🔒 **Secure Room Handling** — Unique room IDs and admin control.
+- 📱 **Clean, Modern UI** — Fully built with Jetpack Compose.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-------------|
+| 🧩 UI | **Jetpack Compose (Material 3)** |
+| 🎬 Video | **YouTube Player API** |
+| 🔗 Networking | **Retrofit + YouTube Data API v3** |
+| ⚡ Realtime | **Socket.IO (Node.js backend)** |
+| 🧠 Architecture | **MVVM + Coroutines + Flow** |
+| 💾 Local Storage | **Room Database** |
+
+---
+
+## 📸 Screenshots
+
+| Home | Search | Participants |
+|------|---------|--------------|
+| ![Home](./screenshots/home.jpg) | ![Search](./screenshots/search.jpg) | ![Participants](./screenshots/participants.jpg) |
+
+| Main | Settings | Splash |
+|------|-----------|--------|
+| ![Main](./screenshots/main.jpg) | ![Settings](./screenshots/setting.jpg) | ![Splash](./screenshots/splash.jpg) |
+
+---
+
+⭐ If you like this project, don’t forget to star the repo!
+
+---
